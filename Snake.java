@@ -7,11 +7,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -40,6 +50,11 @@ public class Snake extends JFrame
 	Timer horloge;
 	JPanel panneau;
 	JLabel gameOver,scoreText;
+	boolean endGame = false;
+	String file = "C:\\Users\\lenovo\\Desktop\\Info1\\S2\\JAVA\\TPs_Dhia\\src\\tp7_snakeGame\\snake.txt";
+	
+	
+	
 	
 	void initialiserSerpent()
 	{
@@ -47,8 +62,6 @@ public class Snake extends JFrame
 		corpsSerpent.add(new Cellule(10,6,new Color(0xE86B4F)));
 		for(int i = 9;i >= 5; i--)
 			corpsSerpent.add(new Cellule(i,6,new Color(0x67D956)));
-		
-		
 		
 	}
 	
@@ -106,6 +119,7 @@ public class Snake extends JFrame
 		this.setSize(nbCaseX*largeur + 2*marge + 10,nbCaseY*largeur + 2*marge +40);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
 		
 		
 		
@@ -188,7 +202,9 @@ public class Snake extends JFrame
 					{
 						
 						printEndMessage();
+						endGame = true;
 						horloge.stop();
+						
 						
 					}
 					
@@ -202,6 +218,7 @@ public class Snake extends JFrame
 						if(corpsSerpent.get(0).x  == c.x  && corpsSerpent.get(0).y == c.y )
 						{
 							printEndMessage();
+							endGame = true;
 							horloge.stop();
 						}
 						
@@ -216,6 +233,146 @@ public class Snake extends JFrame
 		});
 		
 		horloge.start();
+		
+		this.addWindowListener(new WindowAdapter() {
+			
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				super.windowOpened(e);
+				
+				 
+				String coor;
+				String[] tab;
+				ArrayList<String> Array = new ArrayList<String>(); 
+				
+				
+				
+				try {
+					FileReader f = new FileReader(file);
+					BufferedReader buff = new BufferedReader(f);
+					
+					while((coor = buff.readLine()) != null)  //loop every line in the file
+					{
+						tab=coor.split(" ");
+						for(String s : tab)
+							Array.add(s);
+					}
+					
+					direction = Integer.parseInt(Array.get(0));
+					
+					repas.x = Integer.parseInt(Array.get(1));
+					repas.y = Integer.parseInt(Array.get(2));
+					
+					int j =3;
+					for(int i = 0; i < corpsSerpent.size() ; i++)
+					{
+						corpsSerpent.get(i).x = Integer.parseInt(Array.get(j));
+						corpsSerpent.get(i).y = Integer.parseInt(Array.get(++j )) ;
+						j++;
+					}
+					
+
+					for(int i =corpsSerpent.size()*2 +3; i < Array.size()-1; i++)
+					{
+						corpsSerpent.add(new Cellule(Integer.parseInt(Array.get(i)), Integer.parseInt(Array.get(++i)), new Color(0x67D956)));
+					}
+					
+					//0: dir 1 2 : repas 3 4 :tete ....
+					
+					
+					//
+					
+				} /*catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					//e1.printStackTrace();
+					
+				}*/
+				catch(Exception ex) {
+					initialiserSerpent();
+				}
+	
+				
+			}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// TODO Auto-generated method stub
+				super.windowClosing(e);
+				FileWriter f = null ;
+				PrintWriter stylo = null;
+				
+				if(!endGame) {
+					
+					int save = JOptionPane.showConfirmDialog(null, "Voulez vous sauvegarder?");
+					
+					if(save==0)
+					{
+						// créer le fichier 
+						// boucler sur l'ensemble des cellules de serpent
+						
+							try {
+								f = new FileWriter(file);
+								stylo = new PrintWriter(f);
+								stylo.print(direction+"\n");
+								stylo.print(repas.x+ " "+ repas.y+"\n");
+								for(int i = 0 ;i < corpsSerpent.size(); i++)
+								{
+									
+									stylo.print(corpsSerpent.get(i).x+" "+corpsSerpent.get(i).y+"\n");
+								}
+							} catch (IOException e2) {
+								// TODO Auto-generated catch block
+								//e2.printStackTrace();
+							}
+						
+						
+						try {
+							f.close();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							//e1.printStackTrace();
+						}
+					
+						stylo.close();
+						
+						
+					}else if(save==1) {
+						
+						try {
+							f = new FileWriter(file);
+							stylo = new PrintWriter(f);
+							stylo.print("");
+							
+						} catch (Exception ex) {
+							
+						}
+						
+						
+						stylo.close();
+						
+					}
+				}else {
+					try {
+						f = new FileWriter(file);
+						stylo = new PrintWriter(f);
+						stylo.print("");
+						
+					} catch (Exception ex) {
+						
+					}
+					
+					
+					stylo.close();
+				}
+				
+				
+				
+				
+				
+			}
+			
+		});
 		
 		
 		this.addKeyListener(new KeyAdapter() {
