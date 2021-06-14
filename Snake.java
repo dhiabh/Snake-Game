@@ -9,9 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-
 
 
 /*
@@ -51,7 +48,7 @@ public class Snake extends JFrame
 	JPanel panneau;
 	JLabel gameOver,scoreText;
 	boolean endGame = false;
-	String file = "C:\\Users\\lenovo\\Desktop\\Info1\\S2\\JAVA\\TPs_Dhia\\src\\tp7_snakeGame\\snake.txt";
+	String file = "snake.txt";
 	
 	
 	
@@ -260,11 +257,12 @@ public class Snake extends JFrame
 					}
 					
 					direction = Integer.parseInt(Array.get(0));
+					score = Integer.parseInt(Array.get(1));
 					
-					repas.x = Integer.parseInt(Array.get(1));
-					repas.y = Integer.parseInt(Array.get(2));
+					repas.x = Integer.parseInt(Array.get(2));
+					repas.y = Integer.parseInt(Array.get(3));
 					
-					int j =3;
+					int j =4;
 					for(int i = 0; i < corpsSerpent.size() ; i++)
 					{
 						corpsSerpent.get(i).x = Integer.parseInt(Array.get(j));
@@ -273,25 +271,20 @@ public class Snake extends JFrame
 					}
 					
 
-					for(int i =corpsSerpent.size()*2 +3; i < Array.size()-1; i++)
+					for(int i =corpsSerpent.size()*2 +4; i < Array.size()-1; i++)
 					{
 						corpsSerpent.add(new Cellule(Integer.parseInt(Array.get(i)), Integer.parseInt(Array.get(++i)), new Color(0x67D956)));
 					}
+				}
 					
-					//0: dir 1 2 : repas 3 4 :tete ....
+					//0: dir / 1:score / 3 4 : repas ..... 
 					
 					
-					//
-					
-				} /*catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					//e1.printStackTrace();
-					
-				}*/
+				
 				catch(Exception ex) {
 					initialiserSerpent();
 				}
-	
+				
 				
 			}
 			
@@ -306,6 +299,7 @@ public class Snake extends JFrame
 					
 					int save = JOptionPane.showConfirmDialog(null, "Voulez vous sauvegarder?");
 					
+					
 					if(save==0)
 					{
 						// créer le fichier 
@@ -315,6 +309,7 @@ public class Snake extends JFrame
 								f = new FileWriter(file);
 								stylo = new PrintWriter(f);
 								stylo.print(direction+"\n");
+								stylo.print(score+"\n");
 								stylo.print(repas.x+ " "+ repas.y+"\n");
 								for(int i = 0 ;i < corpsSerpent.size(); i++)
 								{
@@ -336,6 +331,8 @@ public class Snake extends JFrame
 					
 						stylo.close();
 						
+						setDefaultCloseOperation(EXIT_ON_CLOSE);
+						
 						
 					}else if(save==1) {
 						
@@ -350,7 +347,11 @@ public class Snake extends JFrame
 						
 						
 						stylo.close();
+
+						setDefaultCloseOperation(EXIT_ON_CLOSE);
 						
+					}else {
+						setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 					}
 				}else {
 					try {
@@ -398,6 +399,8 @@ public class Snake extends JFrame
 		this.setVisible(true);
 	}
 	
+	
+	
 	void dessinerCellule(int x, int y, Color c, Graphics g)
 	{
 		g.setColor(c);
@@ -439,9 +442,7 @@ public class Snake extends JFrame
 				{
 					g.setColor(new Color(0x012134));
 					g.fillRect(i*largeur +marge, j*largeur + marge, largeur, largeur);
-//					Cellule c = new Cellule(i, j, new Color(0x012134));
-//					body.add(c);
-//					dessinerCellule(c, g);
+			
 				}
 					
 			}
@@ -498,8 +499,7 @@ public class Snake extends JFrame
 	
 	public static void main(String[] args)
 	{
-		Snake s = new Snake();
-
+		new Snake();
 	}
 	
 	
@@ -534,6 +534,7 @@ public class Snake extends JFrame
 		public void setCouleur(Color couleur) {
 			this.couleur = couleur;
 		}
+		
 	}
 
 }
